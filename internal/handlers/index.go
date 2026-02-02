@@ -1,12 +1,16 @@
 package handlers
 
 import (
+	_ "embed"
 	"html/template"
 	"log"
 	"net/http"
 
 	. "github.com/deadblackclover/dotshell/internal/utils"
 )
+
+//go:embed index.html
+var templateHTML string
 
 type Data struct {
 	System *System
@@ -39,7 +43,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Working with a template
-	t, err := template.ParseFiles("internal/templates/index.html")
+	t, err := template.New("index").Parse(templateHTML)
 	if err != nil {
 		log.Fatal(err)
 	}
