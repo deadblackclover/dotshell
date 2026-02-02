@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>dotshell</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width initial-scale=1">
+    <style>
+        @media only screen and (min-width: 1100px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        @media only screen and (max-width: 1100px) {
+            header {
+                flex-direction: column-reverse;
+                justify-content: space-between;
+            }
+        }
+
+        @media only screen and (max-width: 640px) {
+            pre {
+                font-size: 0.5rem;
+            }
+        }
+
+        body {
+            background-color: black;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Fira, Sans, "Droid Sans", "Helvetica Neue", sans-serif;
+        }
+
+        .color {
+            color: aquamarine;
+            font-weight: 700;
+        }
+
+        header {
+            display: flex;
+        }
+
+        hr {
+            border-color: aqua;
+        }
+
+        input {
+            background-color: black;
+            color: white;
+            border: 1px solid aqua;
+        }
+
+        .path input {
+            width: 100%;
+        }
+
+        .path button {
+            display: none;
+        }
+
+        textarea {
+            width: 100%;
+            height: 400px;
+            background-color: black;
+            color: white;
+        }
+
+        .files {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .files a, .files a:hover, .files a:active {
+            text-decoration: none;
+        }
+
+        .files tr {
+            border-bottom: 1px solid aqua;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <table>
+            <tr>
+                <td class="color">OS</td>
+                <td>{{ .System.Os }}</td>
+            </tr>
+            <tr>
+                <td class="color">Arch</td>
+                <td>{{ .System.Arch }}</td>
+            </tr>
+            <tr>
+                <td class="color">Hostname</td>
+                <td>{{ .System.Hostname }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <hr>
+                </td>
+            </tr>
+            <tr>
+                <td class="color">User</td>
+                <td>{{ .System.User.Name }} ({{ .System.User.Username }})</td>
+            </tr>
+            <tr>
+                <td class="color">Uid</td>
+                <td>{{ .System.User.Uid }}</td>
+            </tr>
+            <tr>
+                <td class="color">Group</td>
+                <td>{{ .System.User.Gid }}</td>
+            </tr>
+            <tr>
+                <td class="color">Home</td>
+                <td>{{ .System.User.HomeDir }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <hr>
+                </td>
+            </tr>
+            <tr>
+                <td class="color">Go version</td>
+                <td>{{ .System.GoVersion }}</td>
+            </tr>
+        </table>
+        <pre class="color">
+ .S_sSSs      sSSs_sSSs    sdSS_SSSSSSbs    sSSs   .S    S.     sSSs  S.      S.      
+.SS~YS%%b    d%%SP~YS%%b   YSSS~S%SSSSSP   d%%SP  .SS    SS.   d%%SP  SS.     SS.     
+S%S   `S%b  d%S'     `S%b       S%S       d%S'    S%S    S%S  d%S'    S%S     S%S     
+S%S    S%S  S%S       S%S       S%S       S%|     S%S    S%S  S%S     S%S     S%S     
+S%S    S&S  S&S       S&S       S&S       S&S     S%S SSSS%S  S&S     S&S     S&S     
+S&S    S&S  S&S       S&S       S&S       Y&Ss    S&S  SSS&S  S&S_Ss  S&S     S&S     
+S&S    S&S  S&S       S&S       S&S       `S&&S   S&S    S&S  S&S~SP  S&S     S&S     
+S&S    S&S  S&S       S&S       S&S         `S*S  S&S    S&S  S&S     S&S     S&S     
+S*S    d*S  S*b       d*S       S*S          l*S  S*S    S*S  S*b     S*b     S*b     
+S*S   .S*S  S*S.     .S*S       S*S         .S*P  S*S    S*S  S*S.    S*S.    S*S.    
+S*S_sdSSS    SSSbs_sdSSS        S*S       sSS*S   S*S    S*S   SSSbs   SSSbs   SSSbs  
+SSS~YSSY      YSSP~YSSY         S*S       YSS'    SSS    S*S    YSSP    YSSP    YSSP  
+                                SP                       SP                           
+                                Y                        Y
+
+                                by DEADBLACKCLOVER
+            </pre>
+    </header>
+    <main>
+        <form method="get" class="path">
+            <input name="path" value="{{ .File.Path }}" />
+            <button type="submit">OK</button>
+        </form>
+        {{ if .File.IsDir }}
+        {{ $path := .File.Path }}
+        <table class="files">
+            <thead>
+                <tr>
+                    <td>Name</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range $index, $file := .File.Files }}
+                <tr>
+                    <td>
+                        <a href="?path={{ $path }}\{{ $file | urlquery }}" class="color">{{ $file }}</a>
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+        {{ else }}
+        <textarea>{{ .File.Data }}</textarea>
+        {{ end }}
+    </main>
+</body>
+
+</html>
