@@ -48,7 +48,7 @@ func NewFile(path string) (*File, error) {
 }
 
 func (f *File) Read() error {
-	bytes, err := os.ReadFile(f.Path + f.Name)
+	bytes, err := os.ReadFile(f.Path)
 	if err != nil {
 		return err
 	}
