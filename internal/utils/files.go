@@ -1,33 +1,72 @@
 package utils
 
 import (
-	"log"
 	"os"
+	"path/filepath"
 )
 
 type File struct {
 	Name  string
+	Path  string
 	IsDir bool
+	Files []string
+	Data  string
 }
 
-func GetFiles(path string) []File {
-	log.Printf("Getting a list of files in %s", path)
-
-	dirEntry, err := os.ReadDir(path)
+func NewFile(path string) (*File, error) {
+	absPath, err := filepath.Abs(path)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	var result []File
+	fileInfo, err := os.Stat(absPath)
+	if err != nil {
+		return nil, err
+	}
+
+	isDir := fileInfo.IsDir()
+
+	file := &File{
+		Name:  fileInfo.Name(),
+		Path:  absPath,
+		IsDir: isDir,
+	}
+
+	if isDir {
+		err = file.GetFiles()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = file.Read()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return file, nil
+}
+
+func (f *File) Read() error {
+	bytes, err := os.ReadFile(f.Path + f.Name)
+	if err != nil {
+		return err
+	}
+
+	f.Data = string(bytes)
+
+	return nil
+}
+
+func (f *File) GetFiles() error {
+	dirEntry, err := os.ReadDir(f.Path)
+	if err != nil {
+		return err
+	}
 
 	for _, entry := range dirEntry {
-		var file File
-
-		file.Name = entry.Name()
-		file.IsDir = entry.IsDir()
-
-		result = append(result, file)
+		f.Files = append(f.Files, entry.Name())
 	}
 
-	return result
+	return nil
 }
