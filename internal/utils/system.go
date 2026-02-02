@@ -1,33 +1,35 @@
 package utils
 
 import (
+	"log"
 	"os"
+	"os/user"
 	"runtime"
 )
 
 type System struct {
-	Os          string
-	Arch        string
-	Hostname    string
-	UserHomeDir string
-	GoVersion   string
+	Os        string
+	Arch      string
+	Hostname  string
+	User      *user.User
+	GoVersion string
 }
 
-func GetSystemData() System {
-	var data System
-
-	data.Os = runtime.GOOS
-	data.Arch = runtime.GOARCH
+func (s *System) Init() {
+	s.Os = runtime.GOOS
+	s.Arch = runtime.GOARCH
 
 	if hostname, err := os.Hostname(); err == nil {
-		data.Hostname = hostname
+		s.Hostname = hostname
+	} else {
+		log.Println(err)
 	}
 
-	if userHomeDir, err := os.UserHomeDir(); err == nil {
-		data.UserHomeDir = userHomeDir
+	if user, err := user.Current(); err == nil {
+		s.User = user
+	} else {
+		log.Println(err)
 	}
 
-	data.GoVersion = runtime.Version()
-
-	return data
+	s.GoVersion = runtime.Version()
 }
