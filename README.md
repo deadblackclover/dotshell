@@ -1,5 +1,7 @@
 # dotshell
 
+![image.png](image.png)
+
 A web shell on Golang for remote management (file management, command execution, and more)
 
 # Build
