@@ -9,7 +9,7 @@ import (
 	. "github.com/deadblackclover/dotshell/internal/utils"
 )
 
-//go:embed index.html
+//go:embed index.tmpl
 var templateHTML string
 
 type Data struct {
