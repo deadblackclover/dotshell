@@ -13,8 +13,9 @@ import (
 var templateHTML string
 
 type Data struct {
-	System *System
-	File   *File
+	System    *System
+	File      *File
+	CmdOutput string
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,6 +39,13 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// Getting data from the path
 	if file, err := NewFile(params.Path); err == nil {
 		data.File = file
+	} else {
+		log.Println(err)
+	}
+
+	// Execute a command
+	if output, err := ExecuteCmd(params.Cmd); err == nil {
+		data.CmdOutput = output
 	} else {
 		log.Println(err)
 	}
