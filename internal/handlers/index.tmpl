@@ -173,8 +173,8 @@ SSS~YSSY      YSSP~YSSY         S*S       YSS'    SSS    S*S    YSSP    YSSP    
             {{ if ne .CmdOutput "" }}
             <pre class="output">{{ .CmdOutput }}</pre>
             {{ end }}
-            <form method="get" class="cmd">
-                <input name="cmd" placeholder="Shell command" />
+            <form method="get">
+                <input name="cmd" autofocus placeholder="Shell command" />
             </form>
         </div>
         {{ $fileInfo := .File.FileInfo }}
