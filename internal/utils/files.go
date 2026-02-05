@@ -3,14 +3,51 @@ package utils
 import (
 	"os"
 	"path/filepath"
+	"time"
 )
 
+type FileInfo struct {
+	Name    string
+	Path    string
+	ModTime string
+	Perm    string
+	Size    int64
+	IsDir   bool
+}
+
+func (f *FileInfo) initFromPath(path string) error {
+	fileInfo, err := os.Lstat(path)
+	if err != nil {
+		return err
+	}
+
+	f.Name = fileInfo.Name()
+	f.Path = path
+	f.IsDir = fileInfo.IsDir()
+
+	return nil
+}
+
+func (f *FileInfo) initFromDirEntry(entry os.DirEntry) error {
+	fileInfo, err := entry.Info()
+	if err != nil {
+		return err
+	}
+
+	f.Name = fileInfo.Name()
+	f.IsDir = fileInfo.IsDir()
+	f.Size = fileInfo.Size()
+	f.ModTime = fileInfo.ModTime().Format(time.RFC822Z)
+	f.Perm = fileInfo.Mode().Perm().String()
+
+	return nil
+}
+
 type File struct {
-	Name  string
-	Path  string
-	IsDir bool
-	Files []string
-	Data  string
+	Back     string
+	Data     string
+	FileInfo *FileInfo
+	Files    []*FileInfo
 }
 
 func NewFile(path string) (*File, error) {
@@ -19,26 +56,23 @@ func NewFile(path string) (*File, error) {
 		return nil, err
 	}
 
-	fileInfo, err := os.Stat(absPath)
+	fileInfo := new(FileInfo)
+	err = fileInfo.initFromPath(absPath)
 	if err != nil {
 		return nil, err
 	}
 
-	isDir := fileInfo.IsDir()
+	file := new(File)
+	file.FileInfo = fileInfo
+	file.Back = filepath.Join(absPath, "../")
 
-	file := &File{
-		Name:  fileInfo.Name(),
-		Path:  absPath,
-		IsDir: isDir,
-	}
-
-	if isDir {
-		err = file.GetFiles()
+	if fileInfo.IsDir {
+		err = file.getFiles()
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		err = file.Read()
+		err = file.read()
 		if err != nil {
 			return nil, err
 		}
@@ -47,8 +81,8 @@ func NewFile(path string) (*File, error) {
 	return file, nil
 }
 
-func (f *File) Read() error {
-	bytes, err := os.ReadFile(f.Path)
+func (f *File) read() error {
+	bytes, err := os.ReadFile(f.FileInfo.Path)
 	if err != nil {
 		return err
 	}
@@ -58,14 +92,18 @@ func (f *File) Read() error {
 	return nil
 }
 
-func (f *File) GetFiles() error {
-	dirEntry, err := os.ReadDir(f.Path)
+func (f *File) getFiles() error {
+	dirEntry, err := os.ReadDir(f.FileInfo.Path)
 	if err != nil {
 		return err
 	}
 
 	for _, entry := range dirEntry {
-		f.Files = append(f.Files, entry.Name())
+		files := new(FileInfo)
+		files.initFromDirEntry(entry)
+		files.Path = filepath.Join(f.FileInfo.Path, files.Name)
+
+		f.Files = append(f.Files, files)
 	}
 
 	return nil
