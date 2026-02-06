@@ -181,10 +181,12 @@ SSS~YSSY      YSSP~YSSY         S*S       YSS'    SSS    S*S    YSSP    YSSP    
                 <input name="cmd" autofocus placeholder="Shell command" />
             </form>
         </div>
+        {{ $back := "../" }}
+        {{ $path := .File.Path }}
         {{ $fileInfo := .File.FileInfo }}
         <form method="get" class="path">
-            <a href="?path={{ .File.Back }}">&larr;</a>
-            <input name="path" value="{{ $fileInfo.Path }}" />
+            <a href="?path={{ join $path $back }}">&larr;</a>
+            <input name="path" value="{{ $path }}" />
         </form>
         {{ if $fileInfo.IsDir }}
         <table class="files">
@@ -200,7 +202,7 @@ SSS~YSSY      YSSP~YSSY         S*S       YSS'    SSS    S*S    YSSP    YSSP    
                 {{ range $index, $file := .File.Files }}
                 <tr>
                     <td>
-                        <a href="?path={{ $file.Path }}" class="color">{{ $file.Name }}</a>
+                        <a href="?path={{ join $path $file.Name }}" class="color">{{ $file.Name }}</a>
                     </td>
                     <td>
                         {{ if $file.IsDir }}

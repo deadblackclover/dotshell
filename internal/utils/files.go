@@ -26,7 +26,6 @@ import (
 
 type FileInfo struct {
 	Name    string
-	Path    string
 	ModTime string
 	Perm    string
 	Size    int64
@@ -41,7 +40,6 @@ func (f *FileInfo) initFromPath(path string) error {
 	}
 
 	f.Name = fileInfo.Name()
-	f.Path = path
 	f.IsDir = fileInfo.IsDir()
 
 	return nil
@@ -63,7 +61,7 @@ func (f *FileInfo) initFromDirEntry(entry os.DirEntry) error {
 }
 
 type File struct {
-	Back     string
+	Path     string
 	Data     string
 	FileInfo *FileInfo
 	Files    []*FileInfo
@@ -82,8 +80,8 @@ func NewFile(path string) (*File, error) {
 	}
 
 	file := new(File)
+	file.Path = absPath
 	file.FileInfo = fileInfo
-	file.Back = filepath.Join(absPath, "../")
 
 	if fileInfo.IsDir {
 		err = file.getFiles()
@@ -101,7 +99,7 @@ func NewFile(path string) (*File, error) {
 }
 
 func (f *File) read() error {
-	bytes, err := os.ReadFile(f.FileInfo.Path)
+	bytes, err := os.ReadFile(f.Path)
 	if err != nil {
 		return err
 	}
@@ -113,14 +111,14 @@ func (f *File) read() error {
 		f.FileInfo.IsImage = true
 		f.Data = fmt.Sprintf("data:%s;base64,%s", contentType, encoded)
 	} else {
-	f.Data = string(bytes)
+		f.Data = string(bytes)
 	}
 
 	return nil
 }
 
 func (f *File) getFiles() error {
-	dirEntry, err := os.ReadDir(f.FileInfo.Path)
+	dirEntry, err := os.ReadDir(f.Path)
 	if err != nil {
 		return err
 	}
@@ -128,7 +126,6 @@ func (f *File) getFiles() error {
 	for _, entry := range dirEntry {
 		files := new(FileInfo)
 		files.initFromDirEntry(entry)
-		files.Path = filepath.Join(f.FileInfo.Path, files.Name)
 
 		f.Files = append(f.Files, files)
 	}
