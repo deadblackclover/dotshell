@@ -19,6 +19,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"path/filepath"
 
 	. "github.com/deadblackclover/dotshell/internal/utils"
 )
@@ -64,8 +65,15 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
+	funcMap := template.FuncMap{
+		"join": filepath.Join,
+		"url": func(s string) template.URL {
+			return template.URL(s)
+		},
+	}
+
 	// Working with a template
-	t, err := template.New("index").Parse(templateHTML)
+	t, err := template.New("index").Funcs(funcMap).Parse(templateHTML)
 	if err != nil {
 		log.Fatal(err)
 	}
