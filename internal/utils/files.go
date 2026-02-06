@@ -15,8 +15,12 @@
 package utils
 
 import (
+	"encoding/base64"
+	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -27,6 +31,7 @@ type FileInfo struct {
 	Perm    string
 	Size    int64
 	IsDir   bool
+	IsImage bool
 }
 
 func (f *FileInfo) initFromPath(path string) error {
@@ -101,7 +106,15 @@ func (f *File) read() error {
 		return err
 	}
 
+	contentType := http.DetectContentType(bytes[:512])
+	if strings.HasPrefix(contentType, "image/") {
+		encoded := base64.StdEncoding.EncodeToString(bytes)
+
+		f.FileInfo.IsImage = true
+		f.Data = fmt.Sprintf("data:%s;base64,%s", contentType, encoded)
+	} else {
 	f.Data = string(bytes)
+	}
 
 	return nil
 }

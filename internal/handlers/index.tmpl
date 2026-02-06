@@ -52,6 +52,10 @@
             width: 100%;
         }
 
+        img {
+            max-width: 100%;
+        }
+
         header,
         .path {
             display: flex;
@@ -216,7 +220,11 @@ SSS~YSSY      YSSP~YSSY         S*S       YSS'    SSS    S*S    YSSP    YSSP    
             </tbody>
         </table>
         {{ else }}
+        {{ if $fileInfo.IsImage }}
+        <img src="{{ url .File.Data }}" />
+        {{ else }}
         <textarea>{{ .File.Data }}</textarea>
+        {{ end }}
         {{ end }}
     </main>
 </body>
