@@ -196,6 +196,7 @@ SSS~YSSY      YSSP~YSSY         S*S       YSS'    SSS    S*S    YSSP    YSSP    
                     <td>Size</td>
                     <td>Modify</td>
                     <td>Permissions</td>
+                    <td>Actions</td>
                 </tr>
             </thead>
             <tbody>
@@ -216,6 +217,11 @@ SSS~YSSY      YSSP~YSSY         S*S       YSS'    SSS    S*S    YSSP    YSSP    
                     </td>
                     <td>
                         {{ $file.Perm }}
+                    </td>
+                    <td>
+                        {{ if not $file.IsDir }}
+                        <a href="/download?path={{ join $path $file.Name }}" class="color">&dArr;</a>
+                        {{ end }}
                     </td>
                 </tr>
                 {{ end }}

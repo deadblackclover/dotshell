@@ -34,6 +34,7 @@ func main() {
 		port = envPort
 	}
 
+	http.HandleFunc("/download", handlers.DownloadHandler)
 	http.HandleFunc("/", handlers.IndexHandler)
 
 	log.Printf("Server is running at %s:%s\n", host, port)

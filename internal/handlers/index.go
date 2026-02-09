@@ -65,6 +65,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
+	// Built-in functions for template
 	funcMap := template.FuncMap{
 		"join": filepath.Join,
 		"url": func(s string) template.URL {
@@ -78,15 +79,4 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	t.Execute(w, data)
-}
-
-type GetParams struct {
-	Path string
-	Cmd  string
-}
-
-func (p *GetParams) Parse(r *http.Request) {
-	query := r.URL.Query()
-	p.Path = query.Get("path")
-	p.Cmd = query.Get("cmd")
 }
