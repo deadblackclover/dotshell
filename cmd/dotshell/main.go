@@ -15,29 +15,41 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/deadblackclover/dotshell/internal/handlers"
+	"github.com/deadblackclover/dotshell/internal/middleware"
 )
 
 var host string
 var port = "8080"
+var username = ""
+var password = ""
+
+func getEnv(key string, variable *string) {
+	if value := os.Getenv(key); value != "" {
+		*variable = value
+	}
+}
 
 func main() {
-	if envHost := os.Getenv("HOST"); envHost != "" {
-		host = envHost
-	}
+	getEnv("HOST", &host)
+	getEnv("PORT", &port)
+	getEnv("USERNAME", &username)
+	getEnv("PASSWORD", &password)
 
-	if envPort := os.Getenv("PORT"); envPort != "" {
-		port = envPort
-	}
+	c := middleware.Credentials{Username: username, Password: password}
 
-	http.HandleFunc("/download", handlers.DownloadHandler)
-	http.HandleFunc("/", handlers.IndexHandler)
+	mux := http.NewServeMux()
 
-	log.Printf("Server is running at %s:%s\n", host, port)
+	mux.HandleFunc("/download", handlers.DownloadHandler)
+	mux.HandleFunc("/", handlers.IndexHandler)
 
-	log.Fatal(http.ListenAndServe(host+":"+port, nil))
+	addr := fmt.Sprintf("%s:%s", host, port)
+
+	log.Printf("Server is running at %s\n", addr)
+	log.Fatal(http.ListenAndServe(addr, middleware.Authentication(mux, c)))
 }

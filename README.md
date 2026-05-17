@@ -21,5 +21,5 @@ make run
 ```
 For Windows:
 ```
-.\build.ps1 -Task run
+pwsh -c { $env:HOST="0.0.0.0"; $env:USERNAME="root"; $env:PASSWORD="root"; .\build.ps1 -Task run }
 ```
